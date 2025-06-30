@@ -3,14 +3,20 @@ import roomStore from "../models/roomStore.js";
 
 // 방 생성: POST /room
 export const createRoom = (req, res) => {
-  const { ip, password } = req.body;
+  const { ip, title, description, password } = req.body;
 
   if (!ip) {
     return res.status(400).json({ error: "IP가 필요합니다." });
   }
 
   const roomId = uuidv4();
-  roomStore.addRoom({ roomId, ip, password: password || null });
+  roomStore.addRoom({
+    roomId,
+    ip,
+    title,
+    description,
+    password: password || null,
+  });
 
   return res.status(201).json({ roomId });
 };
