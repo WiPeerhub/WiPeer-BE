@@ -6,7 +6,7 @@ export const getClientIP = (req) => {
   console.log("remote Ip", remoteIP);
 
   if (forwardedIP) {
-    return forwardedIP.split(",")[0]; // 여러 IP가 있을 경우 첫번쨰가 클라이언트 IP
+    return forwardedIP.split(",")[0];
   }
 
   if (remoteIP === "::1" || remoteIP === "127.0.0.1") {

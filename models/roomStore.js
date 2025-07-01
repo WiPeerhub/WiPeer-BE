@@ -1,7 +1,7 @@
 const rooms = [];
 
-const addRoom = ({ roomid, ip, title, description, password }) => {
-  rooms.push({ roomid, ip, title, description, password });
+const addRoom = ({ roomId, ip, title, description, password }) => {
+  rooms.push({ roomId, ip, title, description, password });
 };
 
 const getRoomsByIP = (ip) => {
