@@ -18,6 +18,7 @@ export const createRoom = (req, res) => {
     password: password || null,
   });
 
+  console.log(roomId, ip, title, description, password);
   return res.status(201).json({ roomId });
 };
 
