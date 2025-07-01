@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import { saveMessage, getMessages } from "./chatStore.js";
 
 let io;
 
@@ -21,7 +22,14 @@ export const initSocket = (server) => {
 
       socket.emit("all-users", otherUsers);
 
+      const history = getMessages(roomId);
+      socket.emit("chat-history", history);
+
       socket.to(roomId).emit("user-joined", socket.id);
+    });
+
+    socket.on("chat-message", ({ roomId, messageObj }) => {
+      saveMessage(roomId, messageObj);
     });
 
     socket.on("offer", ({ target, sdp }) => {
