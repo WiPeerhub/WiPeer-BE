@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import roomStore from "../models/roomStore.js";
+import { getIO } from "../socket/socket.js";
 
 // 방 생성: POST /room
 export const createRoom = (req, res) => {
@@ -11,6 +12,15 @@ export const createRoom = (req, res) => {
 
   const roomId = uuidv4();
   roomStore.addRoom({
+    roomId,
+    ip,
+    title,
+    description,
+    password: password || null,
+  });
+
+  const io = getIO();
+  io.emit("new-room-created", {
     roomId,
     ip,
     title,

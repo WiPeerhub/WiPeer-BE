@@ -54,3 +54,5 @@ export const initSocket = (server) => {
     });
   });
 };
+
+export const getIO = () => io;
