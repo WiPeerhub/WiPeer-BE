@@ -9,9 +9,5 @@ export const getClientIP = (req) => {
     return forwardedIP.split(",")[0];
   }
 
-  if (remoteIP === "::1" || remoteIP === "127.0.0.1") {
-    return "localhost";
-  }
-
   return remoteIP || null;
 };
