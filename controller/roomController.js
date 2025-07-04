@@ -4,7 +4,7 @@ import { getIO } from "../socket/socket.js";
 
 // 방 생성: POST /room
 export const createRoom = (req, res) => {
-  const { ip, title, description, password } = req.body;
+  const { ip, title, description, password, isPrivate, ownerId } = req.body;
 
   if (!ip) {
     return res.status(400).json({ error: "IP가 필요합니다." });
@@ -16,7 +16,9 @@ export const createRoom = (req, res) => {
     ip,
     title,
     description,
+    isPrivate,
     password: password || null,
+    ownerId,
   });
 
   const io = getIO();
@@ -25,11 +27,34 @@ export const createRoom = (req, res) => {
     ip,
     title,
     description,
+    isPrivate,
     password: password || null,
+    ownerId,
   });
 
-  console.log(roomId, ip, title, description, password);
   return res.status(201).json({ roomId });
+};
+
+// 방 삭제: DELETE /room/:roomId
+export const deleteRoom = (req, res) => {
+  const { roomId } = req.params;
+  const { ownerId } = req.body;
+
+  const room = roomStore.getRoomById(roomId);
+  if (!room) {
+    return res.status(404).json({ error: "Room not found" });
+  }
+
+  if (room.ownerId !== ownerId) {
+    return res.status(403).json({ error: "삭제 권한이 없습니다." });
+  }
+
+  roomStore.removeRoom(roomId);
+
+  const io = getIO();
+  io.emit("room-deleted", roomId);
+
+  return res.status(200).json({ success: true });
 };
 
 // 방 목록 조회: GET /room?ip=xxx.xxx.xxx.xxx
