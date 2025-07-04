@@ -1,6 +1,21 @@
+import redis from "../config/redisClient.js";
+const ROOM_HASH_KEY = "rooms";
+
 let rooms = [];
 
-const addRoom = ({
+// const addRoom = ({
+//   roomId,
+//   ip,
+//   title,
+//   description,
+//   isPrivate,
+//   password,
+//   ownerId,
+// }) => {
+//   rooms.push({ roomId, ip, title, description, isPrivate, password, ownerId });
+// };
+
+const addRoom = async ({
   roomId,
   ip,
   title,
@@ -9,20 +24,49 @@ const addRoom = ({
   password,
   ownerId,
 }) => {
-  rooms.push({ roomId, ip, title, description, isPrivate, password, ownerId });
+  const room = {
+    roomId,
+    ip,
+    title,
+    description,
+    isPrivate,
+    password,
+    ownerId,
+  };
+  await redis.hset(ROOM_HASH_KEY, roomId, JSON.stringify(room));
 };
 
-const getRoomsByIP = (ip) => {
-  return rooms.filter((room) => room.ip === ip);
+// const getRoomsByIP = (ip) => {
+//   return rooms.filter((room) => room.ip === ip);
+// };
+
+const getRoomsByIP = async (ip) => {
+  const rooms = await redis.hvals(ROOM_HASH_KEY);
+  return rooms
+    .map((roomStr) => JSON.parse(roomStr))
+    .filter((room) => room.ip === ip);
 };
 
-const getRoomById = (roomId) => rooms.find((room) => room.roomId === roomId);
-
-const removeRoom = (roomId) => {
-  rooms = rooms.filter((room) => room.roomId !== roomId);
+// const getRoomById = (roomId) => rooms.find((room) => room.roomId === roomId);
+const getRoomById = async (roomId) => {
+  const data = await redis.hget(ROOM_HASH_KEY, roomId);
+  return data ? JSON.parse(data) : null;
 };
 
-const getAllRooms = () => rooms;
+// const removeRoom = (roomId) => {
+//   rooms = rooms.filter((room) => room.roomId !== roomId);
+// };
+
+const removeRoom = async (roomId) => {
+  await redis.hdel(ROOM_HASH_KEY, roomId);
+};
+
+// const getAllRooms = () => rooms;
+
+const getAllRooms = async () => {
+  const all = await redis.hvals(ROOM_HASH_KEY);
+  return all.map((roomStr) => JSON.parse(roomStr));
+};
 
 export default {
   addRoom,

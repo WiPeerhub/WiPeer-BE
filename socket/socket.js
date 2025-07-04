@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { saveMessage, getMessages } from "./chatStore.js";
+import { saveMessage, getMessages } from "../models/chatStore.js";
 
 let io;
 
@@ -11,7 +11,7 @@ export const initSocket = (server) => {
   io.on("connection", (socket) => {
     console.log(`Socket connected: ${socket.id}`);
 
-    socket.on("join-room", (roomId) => {
+    socket.on("join-room", async (roomId) => {
       socket.join(roomId);
       console.log(`${socket.id} joined room: ${roomId}`);
 
@@ -22,14 +22,14 @@ export const initSocket = (server) => {
 
       socket.emit("all-users", otherUsers);
 
-      const history = getMessages(roomId);
+      const history = await getMessages(roomId);
       socket.emit("chat-history", history);
 
       socket.to(roomId).emit("user-joined", socket.id);
     });
 
-    socket.on("chat-message", ({ roomId, messageObj }) => {
-      saveMessage(roomId, messageObj);
+    socket.on("chat-message", async ({ roomId, messageObj }) => {
+      await saveMessage(roomId, messageObj);
     });
 
     socket.on("offer", ({ target, sdp }) => {
