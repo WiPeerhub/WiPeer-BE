@@ -3,6 +3,7 @@ import cors from "cors";
 import http from "http";
 import ipRouter from "./routes/ip.js";
 import roomRouter from "./routes/room.js";
+import uploadRouter from "./routes/upload.js";
 import { initSocket } from "./socket/socket.js";
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use("/ip", ipRouter);
 app.use("/room", roomRouter);
+app.use("/upload", uploadRouter);
 
 const server = http.createServer(app);
 
