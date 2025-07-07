@@ -24,7 +24,7 @@ export const getPresignedURL = async (req, res) => {
   const getParams = {
     Bucket: process.env.S3_BUCKET_NAME,
     Key: fileName,
-    Expires: 60,
+    Expires: 3600,
     ResponseContentDisposition: `attachment; filename="${encodedFileName}"`,
   };
   try {
@@ -34,7 +34,7 @@ export const getPresignedURL = async (req, res) => {
     res.json({
       uploadUrl,
       downloadUrl,
-      fileUrl: `https://${putParams.Bucket}.s3.amazonaws.com/${fileName}`,
+      fileUrl: `https://${putParams.Bucket}.s3.ap-northeast-2.amazonaws.com/${fileName}`,
     });
   } catch (err) {
     console.error("Presigned URL 생성 에러:", err);
