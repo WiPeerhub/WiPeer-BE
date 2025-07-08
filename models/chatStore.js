@@ -11,3 +11,12 @@ export async function getMessages(roomId) {
   const messages = await redis.lrange(key, 0, -1);
   return messages.map((msg) => JSON.parse(msg));
 }
+
+export async function getLastMessage(roomId) {
+  const key = `${CHAT_PREFIX}${roomId}`;
+  const result = await redis.lrange(key, -1, -1);
+
+  if (result.length === 0) return null;
+
+  return JSON.parse(result[0]);
+}
