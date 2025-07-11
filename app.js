@@ -4,7 +4,7 @@ import http from "http";
 import ipRouter from "./routes/ip.js";
 import roomRouter from "./routes/room.js";
 import uploadRouter from "./routes/upload.js";
-import lastChatRouter from "./routes/lastChat.js";
+import chatRouter from "./routes/chat.js";
 import { initSocket } from "./socket/socket.js";
 
 const app = express();
@@ -15,7 +15,7 @@ app.use(express.json());
 app.use("/ip", ipRouter);
 app.use("/room", roomRouter);
 app.use("/upload", uploadRouter);
-app.use("/last-message", lastChatRouter);
+app.use("/", chatRouter);
 
 const server = http.createServer(app);
 
