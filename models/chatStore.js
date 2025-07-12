@@ -55,5 +55,5 @@ export async function updateMessage(roomId, messageId, ownerId, updates) {
     await redis.rpush(key, ...updateMessages);
   }
 
-  return updateMessage;
+  return updatedMessage;
 }
