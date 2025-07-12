@@ -52,6 +52,6 @@ export async function updateMessage(roomId, messageId, ownerId, updates) {
 
   await redis.del(key);
   if (updateMessages.length > 0) {
-    await redis.rpush(key, ...updateMessage);
+    await redis.rpush(key, ...updateMessages);
   }
 }

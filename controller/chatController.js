@@ -30,14 +30,18 @@ export async function updateMessageById(req, res) {
   }
 
   try {
-    await updateMessage(roomId, messageId, ownerId, {
+    const updatedMessage = await updateMessage(roomId, messageId, ownerId, {
       message: newMessage,
       files: newFiles,
     });
 
     res
       .status(200)
-      .json({ success: true, message: "메시지가 수정되었습니다." });
+      .json({
+        success: true,
+        message: "메시지가 수정되었습니다.",
+        data: updatedMessage,
+      });
   } catch (err) {
     if (err.code === 403) {
       return res.status(403).json({ success: false, message: err.message });
