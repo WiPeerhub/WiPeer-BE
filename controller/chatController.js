@@ -23,6 +23,8 @@ export async function updateMessageById(req, res) {
   const { roomId, messageId } = req.params;
   const { ownerId, newMessage, newFiles } = req.body;
 
+  console.log("ownerId", ownerId);
+
   if (!ownerId) {
     return res
       .status(400)
@@ -35,13 +37,11 @@ export async function updateMessageById(req, res) {
       files: newFiles,
     });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "메시지가 수정되었습니다.",
-        data: updatedMessage,
-      });
+    res.status(200).json({
+      success: true,
+      message: "메시지가 수정되었습니다.",
+      data: updatedMessage,
+    });
   } catch (err) {
     if (err.code === 403) {
       return res.status(403).json({ success: false, message: err.message });

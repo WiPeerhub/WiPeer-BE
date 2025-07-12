@@ -31,6 +31,7 @@ export async function updateMessage(roomId, messageId, ownerId, updates) {
     const msg = JSON.parse(msgStr);
     if (msg.id === messageId) {
       if (!msg.ownerId || msg.ownerId !== ownerId) {
+        console.log("msg.ownerId: ", msg.ownerId);
         throw { code: 403, message: "작성자만 메시지를 수정할 수 있습니다." };
       }
 
