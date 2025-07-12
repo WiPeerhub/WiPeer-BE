@@ -24,12 +24,13 @@ export async function getLastMessage(roomId) {
 export async function updateMessage(roomId, messageId, ownerId, updates) {
   const key = `$P{CHAT_PREFIX}${roomId}`;
   const messages = await redis.lrange(key, 0, -1);
+  console.log("messageId In", messageId);
 
   let updated = false;
 
   const updateMessages = messages.map((msgStr) => {
     const msg = JSON.parse(msgStr);
-
+    console.log(msg.id);
     if (msg.id === messageId) {
       if (!msg.ownerId || msg.ownerId !== ownerId) {
         throw { code: 403, message: "작성자만 메시지를 수정할 수 있습니다." };
