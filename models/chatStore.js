@@ -46,12 +46,16 @@ export async function updateMessage(roomId, messageId, ownerId, updates) {
     return msgStr;
   });
 
+  console.log("updateMessages length:", updateMessages.length);
+  console.log("updateMessages[0]:", updateMessages[0]);
+
   if (!updated) {
     throw { code: 404, message: "메시지를 찾을 수 없습니다." };
   }
-
+  console.log("Saving to Redis:", updateMessages);
   await redis.del(key);
   if (updateMessages.length > 0) {
     await redis.rpush(key, ...updateMessages);
+    console.log("Redis updated");
   }
 }
