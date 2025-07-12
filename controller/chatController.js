@@ -23,8 +23,6 @@ export async function updateMessageById(req, res) {
   const { roomId, messageId } = req.params;
   const { ownerId, newMessage, newFiles } = req.body;
 
-  console.log("ownerId", ownerId);
-
   if (!ownerId) {
     return res
       .status(400)
