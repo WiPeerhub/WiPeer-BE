@@ -14,11 +14,11 @@ export async function getMessages(roomId) {
 
 export async function getLastMessage(roomId) {
   const key = `${CHAT_PREFIX}${roomId}`;
-  const result = await redis.lrange(key, -1, -1);
+  const message = await redis.lrange(key, -1, -1);
 
-  if (result.length === 0) return null;
+  if (message.length === 0) return null;
 
-  return JSON.parse(result[0]);
+  return JSON.parse(message[0]);
 }
 
 export async function updateMessage(roomId, messageId, ownerId, updates) {
@@ -56,4 +56,35 @@ export async function updateMessage(roomId, messageId, ownerId, updates) {
   }
 
   return updatedMessage;
+}
+
+export async function removeMessage(roomId, messageId, ownerId) {
+  const key = `${CHAT_PREFIX}${roomId}`;
+  const messages = await redis.lrange(key, 0, -1);
+
+  let found = false;
+
+  const filteredMessages = messages.filter((msgStr) => {
+    const msg = JSON.parse(msgStr);
+
+    if (msg.id === messageId) {
+      if (!msg.ownerId || msg.ownerId !== ownerId) {
+        throw { code: 403, message: "작성자만 메시지를 삭제할 수 있습니다." };
+      }
+
+      found = true;
+      return false;
+    }
+
+    return true;
+  });
+
+  if (!found) {
+    throw { code: 404, message: "메시지를 찾을 수 없습니다." };
+  }
+
+  await redis.del(key);
+  if (filteredMessages.length > 0) {
+    await redis.rpush(key, ...filteredMessages);
+  }
 }
