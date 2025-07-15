@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from "uuid";
 import roomStore from "../models/roomStore.js";
 import { getIO } from "../socket/socket.js";
 
-// 방 생성: POST /room
 export const createRoom = async (req, res) => {
   const { ip, title, description, password, isPrivate, ownerId } = req.body;
 
@@ -35,7 +34,6 @@ export const createRoom = async (req, res) => {
   return res.status(201).json({ roomId });
 };
 
-// 방 삭제: DELETE /room/:roomId
 export const deleteRoom = async (req, res) => {
   const { roomId } = req.params;
   const { ownerId } = req.body;

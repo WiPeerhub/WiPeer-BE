@@ -1,4 +1,5 @@
 import AWS from "aws-sdk";
+import { deleteFileFromS3 } from "../utils/deleteFileFromS3.js";
 
 const s3 = new AWS.S3({
   region: process.env.AWS_REGION,
@@ -39,5 +40,21 @@ export const getPresignedURL = async (req, res) => {
   } catch (err) {
     console.error("Presigned URL 생성 에러:", err);
     res.status(500).json({ error: "S3 presigned URL 생성 실패", details: err });
+  }
+};
+
+export const deleteFilesFromS3Handler = async (req, res) => {
+  const { fileKeys } = req.body;
+  console.log(fileKeys);
+
+  if (!fileKeys || fileKeys.length === 0) {
+    return res.status(400).json({ error: "삭제할 파일 키가 없습니다." });
+  }
+
+  try {
+    await deleteFileFromS3(fileKeys);
+    res.status(200).json({ message: "삭제 완료", deleted: fileKeys });
+  } catch (err) {
+    res.status(500).json({ error: "삭제 실패", details: err.message });
   }
 };
