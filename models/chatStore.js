@@ -25,19 +25,26 @@ export async function updateMessage(roomId, messageId, ownerId, updates) {
   const key = `${CHAT_PREFIX}${roomId}`;
   const messages = await redis.lrange(key, 0, -1);
 
+  console.log("updates.reactions:", updates.reactions);
+
   let updatedMessage = null;
 
   const updateMessages = messages.map((msgStr) => {
     const msg = JSON.parse(msgStr);
     if (msg.id === messageId) {
-      if (!msg.ownerId || msg.ownerId !== ownerId) {
-        throw { code: 403, message: "작성자만 메시지를 수정할 수 있습니다." };
+      if (updates.message || updates.files) {
+        if (!msg.ownerId || msg.ownerId !== ownerId) {
+          throw { code: 403, message: "작성자만 메시지를 수정할 수 있습니다." };
+        }
       }
 
       updatedMessage = {
         ...msg,
         ...(updates.message !== undefined && { message: updates.message }),
         ...(updates.files !== undefined && { files: updates.files }),
+        ...(updates.reactions !== undefined && {
+          reactions: updates.reactions,
+        }),
       };
 
       return JSON.stringify(updatedMessage);

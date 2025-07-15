@@ -26,7 +26,7 @@ export async function getLastMessageByRoom(req, res) {
 
 export async function updateMessageById(req, res) {
   const { roomId, messageId } = req.params;
-  const { ownerId, newMessage, newFiles } = req.body;
+  const { ownerId, newMessage, newFiles, reactions } = req.body;
 
   if (!ownerId) {
     return res
@@ -38,7 +38,11 @@ export async function updateMessageById(req, res) {
     const updatedMessage = await updateMessage(roomId, messageId, ownerId, {
       message: newMessage,
       files: newFiles,
+      reactions,
     });
+
+    const io = getIO();
+    io.to(roomId).emit("message-updated", updatedMessage);
 
     res.status(200).json({
       success: true,
@@ -58,6 +62,39 @@ export async function updateMessageById(req, res) {
     res
       .status(500)
       .json({ success: false, message: "서버 오류로 메시지 수정 실패" });
+  }
+}
+
+export async function updateReactionsById(req, res) {
+  const { roomId, messageId } = req.params;
+  const { reactions } = req.body;
+
+  try {
+    const updatedMessage = await updateMessage(roomId, messageId, null, {
+      reactions,
+    });
+
+    const io = getIO();
+    io.to(roomId).emit("message-updated", updatedMessage);
+
+    res.status(200).json({
+      success: true,
+      message: "반응이 수정되었습니다.",
+      data: updatedMessage,
+    });
+  } catch (err) {
+    if (err.code === 403) {
+      return res.status(403).json({ success: false, message: err.message });
+    }
+
+    if (err.code === 404) {
+      return res.status(404).json({ success: false, message: err.message });
+    }
+
+    console.error("updateReactionsById error:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "서버 오류로 반응 수정 실패" });
   }
 }
 
