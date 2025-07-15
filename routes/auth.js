@@ -21,14 +21,20 @@ router.get(
   (req, res) => {
     const token = generateToken(req.user);
 
-    res.redirect(`${process.env.CLIENT_URL}/oauth/callback?token=${token}`);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      maxAge: 60 * 60 * 1000,
+    });
+
+    res.redirect(`${process.env.CLIENT_URL}/oauth/callback`);
   }
 );
 
 router.get("/logout", (req, res) => {
-  req.logout(() => {
-    res.redirect("/");
-  });
+  res.clearCookie("token");
+  res.redirect("/");
 });
 
 export default router;
