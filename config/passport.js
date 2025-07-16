@@ -6,10 +6,9 @@ import redisClient from "./redisClient.js";
 passport.use(
   new GoogleStrategy(
     {
-      clientID:
-        "1047349078588-4iuu2bfb0on0ag6rbo8v5amegmc6neoh.apps.googleusercontent.com",
-      clientSecret: "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",
-      callbackURL: "http://localhost:4000/auth/google/callback",
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
