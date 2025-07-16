@@ -31,10 +31,27 @@ export async function updateMessage(roomId, messageId, ownerId, updates) {
 
   const updateMessages = messages.map((msgStr) => {
     const msg = JSON.parse(msgStr);
+
     if (msg.id === messageId) {
       if (updates.message || updates.files) {
         if (!msg.ownerId || msg.ownerId !== ownerId) {
           throw { code: 403, message: "작성자만 메시지를 수정할 수 있습니다." };
+        }
+      }
+
+      let mergedReactions = msg.reactions || {};
+
+      if (updates.reactions !== undefined) {
+        for (const [emoji, newUsers] of Object.entries(updates.reactions)) {
+          if (!mergedReactions[emoji]) {
+            mergedReactions[emoji] = [];
+          }
+
+          for (const user of newUsers) {
+            if (!mergedReactions[emoji].includes(user)) {
+              mergedReactions[emoji].push(user);
+            }
+          }
         }
       }
 
@@ -43,7 +60,9 @@ export async function updateMessage(roomId, messageId, ownerId, updates) {
         ...(updates.message !== undefined && { message: updates.message }),
         ...(updates.files !== undefined && { files: updates.files }),
         ...(updates.reactions !== undefined && {
-          reactions: updates.reactions,
+          ...(updates.reactions !== undefined && {
+            reactions: mergedReactions,
+          }),
         }),
       };
 
