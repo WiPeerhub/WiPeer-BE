@@ -8,6 +8,7 @@ import {
   recordRoomVisit,
   deleteRoom,
   getRoomByRoomIdOnly,
+  getRoomsByOwner,
 } from "../controller/roomController.js";
 
 const router = express.Router();
@@ -19,6 +20,8 @@ router.get("/", getRoomsByIP);
 router.get("/user/:userId", getUserVisitedRooms);
 
 router.get("/id/:roomId", getRoomByRoomIdOnly);
+
+router.get("/owner/:ownerId", getRoomsByOwner);
 
 router.get("/:ownerId/:roomId", getRoomDetail);
 

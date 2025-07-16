@@ -77,7 +77,7 @@ const getUserRooms = async (userId) => {
   return roomData.filter(Boolean).map((roomStr) => JSON.parse(roomStr));
 };
 
-const updateRoomIPIfChanged = async (roomId, ownerId, newIP, userId) => {
+const updateRoomIPIfChanged = async (roomId, ownerId, newIP) => {
   const roomKey = getRoomKey(ownerId, roomId);
   const room = await getRoomById(roomId, ownerId);
   if (!room || room.ip === newIP) return null;
@@ -97,6 +97,12 @@ const getAllRooms = async () => {
   return all.map((roomStr) => JSON.parse(roomStr));
 };
 
+const getRoomsByOwner = async (ownerId) => {
+  const roomKeys = await redis.smembers(`${ROOMS_BY_OWNER_PREFIX}${ownerId}`);
+  const roomData = await redis.hmget(ROOM_HASH_KEY, ...roomKeys);
+  return roomData.filter(Boolean).map((roomStr) => JSON.parse(roomStr));
+};
+
 export default {
   addRoom,
   getRoomsByIP,
@@ -106,4 +112,5 @@ export default {
   getUserRooms,
   updateRoomIPIfChanged,
   getAllRooms,
+  getRoomsByOwner,
 };

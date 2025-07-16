@@ -6,8 +6,8 @@ export const createRoom = async (req, res) => {
   const { ip, title, description, password, isPrivate, ownerId, wifiId } =
     req.body;
 
-  if (!ip || !ownerId) {
-    return res.status(400).json({ error: "IP와 ownerId가 필요합니다." });
+  if (!ownerId) {
+    return res.status(400).json({ error: "ownerId가 필요합니다." });
   }
 
   const roomId = uuidv4();
@@ -84,26 +84,23 @@ export const getUserVisitedRooms = async (req, res) => {
 
 export const updateRoomIP = async (req, res) => {
   const { ownerId, roomId } = req.params;
-  const { ip, userId } = req.body;
+  const { ip } = req.body;
 
-  if (!ownerId || !roomId || !ip || !userId) {
-    return res
-      .status(400)
-      .json({ error: "ownerId, roomId, ip, userId가 필요합니다." });
+  if (!ownerId || !roomId || !ip) {
+    return res.status(400).json({ error: "ownerId, roomId, ip가 필요합니다." });
   }
 
   const updatedRoom = await roomStore.updateRoomIPIfChanged(
     roomId,
     ownerId,
-    ip,
-    userId
+    ip
   );
   if (!updatedRoom) {
     return res.status(404).json({ error: "Room not found or unchanged." });
   }
 
   const io = getIO();
-  io.emit("room-ip-updated", { roomId, newIp: ip });
+  io.emit("room-ip-updated", { updatedRoom });
 
   return res.json({ room: updatedRoom });
 };
@@ -165,4 +162,22 @@ export const getRoomByRoomIdOnly = async (req, res) => {
   }
 
   return res.json({ room: targetRoom });
+};
+
+export const getRoomsByOwner = async (req, res) => {
+  const { ownerId } = req.params;
+
+  console.log("ownerID", ownerId);
+
+  if (!ownerId) {
+    return res.status(400).json({ error: "ownerId가 필요합니다." });
+  }
+
+  try {
+    const rooms = await roomStore.getRoomsByOwner(ownerId);
+    return res.status(200).json({ rooms });
+  } catch (error) {
+    console.error("getRoomsByOwner error:", error);
+    return res.status(500).json({ error: "서버 에러가 발생했습니다." });
+  }
 };
