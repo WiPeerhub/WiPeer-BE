@@ -2,6 +2,8 @@ import { Server } from "socket.io";
 import { saveMessage, getMessages } from "../models/chatStore.js";
 import { pub, sub } from "../config/redisPubSub.js";
 
+let io;
+
 sub.psubscribe("chat:*");
 
 sub.on("pmessage", (pattern, channel, messageStr) => {
@@ -9,12 +11,9 @@ sub.on("pmessage", (pattern, channel, messageStr) => {
 
   const roomId = channel.split(":")[1];
   const messageObj = JSON.parse(messageStr);
-  console.log("SubScribe");
 
   io.to(roomId).emit("new-message", messageObj);
 });
-
-let io;
 
 export const initSocket = (server) => {
   io = new Server(server, {
