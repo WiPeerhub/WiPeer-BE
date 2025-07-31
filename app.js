@@ -46,6 +46,10 @@ initSocket(server);
 
 const PORT = process.env.PORT || 4000;
 
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 server.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);
 });
