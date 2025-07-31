@@ -46,6 +46,8 @@ initSocket(server);
 
 const PORT = process.env.PORT || 4000;
 
+app.set("trust proxy", true);
+
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
