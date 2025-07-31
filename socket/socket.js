@@ -1,5 +1,18 @@
 import { Server } from "socket.io";
 import { saveMessage, getMessages } from "../models/chatStore.js";
+import { pub, sub } from "../config/redisPubSub.js";
+
+sub.psubscribe("chat:*");
+
+sub.on("pmessage", (pattern, channel, messageStr) => {
+  if (!channel || !messageStr) return;
+
+  const roomId = channel.split(":")[1];
+  const messageObj = JSON.parse(messageStr);
+  console.log("SubScribe");
+
+  io.to(roomId).emit("new-message", messageObj);
+});
 
 let io;
 
@@ -13,7 +26,6 @@ export const initSocket = (server) => {
 
     socket.on("join-room", async (roomId) => {
       socket.join(roomId);
-      console.log(`${socket.id} joined room: ${roomId}`);
 
       const clientsInRoom = Array.from(
         io.sockets.adapter.rooms.get(roomId) || []
@@ -30,6 +42,7 @@ export const initSocket = (server) => {
 
     socket.on("chat-message", async ({ roomId, messageObj }) => {
       await saveMessage(roomId, messageObj);
+      await pub.publish(`chat:${roomId}`, JSON.stringify(messageObj));
     });
 
     socket.on("offer", ({ target, sdp }) => {
