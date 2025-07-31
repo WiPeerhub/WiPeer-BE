@@ -9,8 +9,14 @@ const redisOptions = {
 export const pub = new Redis(redisOptions);
 export const sub = new Redis(redisOptions);
 
-pub.on("connect", () => console.log("Redis Pub connected"));
-sub.on("connect", () => console.log("Redis Sub connected"));
+pub.on("connect", () => console.log("[Redis Pub] 연결 성공"));
+sub.on("connect", () => console.log("[Redis Sub] 연결 성공"));
 
-pub.on("error", (err) => console.error("Redis Pub error:", err));
-sub.on("error", (err) => console.error("Redis Sub error:", err));
+pub.on("ready", () => console.log("[Redis Pub] 준비 완료"));
+sub.on("ready", () => console.log("[Redis Sub] 준비 완료"));
+
+pub.on("error", (err) => console.error("[Redis Pub] 에러:", err));
+sub.on("error", (err) => console.error("[Redis Sub] 에러:", err));
+
+pub.on("end", () => console.warn("[Redis Pub] 연결 종료"));
+sub.on("end", () => console.warn("[Redis Sub] 연결 종료"));

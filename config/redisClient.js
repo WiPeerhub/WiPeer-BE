@@ -7,11 +7,23 @@ const redis = new Redis({
 });
 
 redis.on("connect", () => {
-  console.log("Redis connected");
+  console.log("[Redis] 연결 성공");
+});
+
+redis.on("ready", () => {
+  console.log("[Redis] 준비 완료 (ready)");
 });
 
 redis.on("error", (err) => {
-  console.error("Redis error:", err);
+  console.error("[Redis] 에러:", err);
+});
+
+redis.on("close", () => {
+  console.warn("[Redis] 연결 닫힘 (close)");
+});
+
+redis.on("end", () => {
+  console.warn("[Redis] 연결 종료 (end)");
 });
 
 export default redis;
