@@ -8,6 +8,7 @@ let io;
 export const initSocket = async (server) => {
   io = new Server(server, {
     cors: { origin: "*" },
+    transports: ["websocket"],
   });
 
   const redisHost = process.env.REDIS_HOST;
