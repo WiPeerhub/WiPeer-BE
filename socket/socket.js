@@ -1,4 +1,6 @@
 import { Server } from "socket.io";
+import { createAdapter } from "@socket.io/redis-adapter";
+import { createClient } from "redis";
 import { saveMessage, getMessages } from "../models/chatStore.js";
 import { pub, sub } from "../config/redisPubSub.js";
 
@@ -15,10 +17,23 @@ sub.on("pmessage", (pattern, channel, messageStr) => {
   io.to(roomId).emit("new-message", messageObj);
 });
 
-export const initSocket = (server) => {
+export const initSocket = async (server) => {
   io = new Server(server, {
     cors: { origin: "*" },
   });
+
+  const redisHost = process.env.REDIS_HOST;
+  const redisPort = Number(process.env.REDIS_PORT);
+
+  const pubClient = createClient({
+    socket: { host: redisHost, port: redisPort },
+  });
+  const subClient = pubClient.duplicate();
+
+  await pubClient.connect();
+  await subClient.connect();
+
+  io.adapter(createAdapter(pubClient, subClient));
 
   io.on("connection", (socket) => {
     console.log(`Socket connected: ${socket.id}`);
