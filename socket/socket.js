@@ -2,20 +2,8 @@ import { Server } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
 import { saveMessage, getMessages } from "../models/chatStore.js";
-import { pub, sub } from "../config/redisPubSub.js";
 
 let io;
-
-sub.psubscribe("chat:*");
-
-sub.on("pmessage", (pattern, channel, messageStr) => {
-  if (!channel || !messageStr) return;
-
-  const roomId = channel.split(":")[1];
-  const messageObj = JSON.parse(messageStr);
-
-  io.to(roomId).emit("new-message", messageObj);
-});
 
 export const initSocket = async (server) => {
   io = new Server(server, {
@@ -56,7 +44,7 @@ export const initSocket = async (server) => {
 
     socket.on("chat-message", async ({ roomId, messageObj }) => {
       await saveMessage(roomId, messageObj);
-      await pub.publish(`chat:${roomId}`, JSON.stringify(messageObj));
+      io.to(roomId).emit("new-message", messageObj);
     });
 
     socket.on("offer", ({ target, sdp }) => {
