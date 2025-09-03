@@ -44,6 +44,8 @@ export const initSocket = async (server) => {
     });
 
     socket.on("chat-message", async ({ roomId, messageObj }) => {
+      console.log("roomId: ", roomId);
+      console.log("messageObj: ", messageObj);
       await saveMessage(roomId, messageObj);
       io.to(roomId).emit("new-message", messageObj);
     });
